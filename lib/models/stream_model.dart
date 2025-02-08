@@ -1,35 +1,35 @@
 class StreamModel {
-  final String streamId;
+  final String id;
   final String title;
   final String game;
-  final DateTime startTime;
-  final int viewerCount;
+  final int viewers;
+  final DateTime startedAt;
 
   StreamModel({
-    required this.streamId,
+    required this.id,
     required this.title,
     required this.game,
-    required this.startTime,
-    required this.viewerCount,
+    required this.viewers,
+    required this.startedAt,
   });
 
-  factory StreamModel.fromMap(Map<String, dynamic> data) {
+  factory StreamModel.fromJson(Map<String, dynamic> json) {
     return StreamModel(
-      streamId: data['streamId'] ?? '',
-      title: data['title'] ?? '',
-      game: data['game'] ?? '',
-      startTime: DateTime.parse(data['startTime'] ?? DateTime.now().toIso8601String()),
-      viewerCount: data['viewerCount'] ?? 0,
+      id: json['id'],
+      title: json['title'],
+      game: json['game_name'],
+      viewers: json['viewer_count'] ?? 0,
+      startedAt: DateTime.parse(json['started_at']),
     );
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
-      'streamId': streamId,
+      'id': id,
       'title': title,
-      'game': game,
-      'startTime': startTime.toIso8601String(),
-      'viewerCount': viewerCount,
+      'game_name': game,
+      'viewer_count': viewers,
+      'started_at': startedAt.toIso8601String(),
     };
   }
 }

@@ -1,35 +1,31 @@
 class UserModel {
   final String id;
-  final String displayName;
-  final String email;
+  final String username;
   final String profileImageUrl;
-  final bool isSubscriber;
+  final int followers;
 
   UserModel({
     required this.id,
-    required this.displayName,
-    required this.email,
+    required this.username,
     required this.profileImageUrl,
-    required this.isSubscriber,
+    required this.followers,
   });
 
-  factory UserModel.fromMap(Map<String, dynamic> data) {
+  factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: data['id'] ?? '',
-      displayName: data['displayName'] ?? '',
-      email: data['email'] ?? '',
-      profileImageUrl: data['profileImageUrl'] ?? '',
-      isSubscriber: data['isSubscriber'] ?? false,
+      id: json['id'],
+      username: json['username'],
+      profileImageUrl: json['profile_image_url'],
+      followers: json['followers'] ?? 0,
     );
   }
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'displayName': displayName,
-      'email': email,
-      'profileImageUrl': profileImageUrl,
-      'isSubscriber': isSubscriber,
+      'username': username,
+      'profile_image_url': profileImageUrl,
+      'followers': followers,
     };
   }
 }

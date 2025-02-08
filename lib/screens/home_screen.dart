@@ -1,52 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import '../services/auth_service.dart';
-import 'analytics_screen.dart';
-import 'community_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class HomeScreen extends StatelessWidget {
-  final AuthService _authService = AuthService();
+class HomeScreen extends StatefulWidget {
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Twitch Affiliate Tracker'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.logout),
-            onPressed: () async {
-              await FirebaseAuth.instance.signOut();
-              Navigator.pushReplacementNamed(context, '/');
+      appBar: AppBar(title: Text("Twitch Affiliate Tracker")),
+      body: StreamBuilder(
+        stream: _db.collection("streams").snapshots(),
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (!snapshot.hasData) {
+            return Center(child: CircularProgressIndicator());
+          }
+          var streams = snapshot.data!.docs;
+          return ListView.builder(
+            itemCount: streams.length,
+            itemBuilder: (context, index) {
+              var stream = streams[index];
+              return ListTile(
+                title: Text(stream['title']),
+                subtitle: Text("Viewers: ${stream['viewer_count']}"),
+              );
             },
-          ),
-        ],
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AnalyticsScreen()),
-                );
-              },
-              child: Text('View Analytics'),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CommunityScreen()),
-                );
-              },
-              child: Text('Community Support'),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

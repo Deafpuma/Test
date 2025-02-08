@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../services/twitch_service.dart';
+import '../services/api_service.dart';
 
 class AnalyticsScreen extends StatefulWidget {
   @override
@@ -7,51 +7,41 @@ class AnalyticsScreen extends StatefulWidget {
 }
 
 class _AnalyticsScreenState extends State<AnalyticsScreen> {
-  final TwitchService _twitchService = TwitchService();
-  Map<String, dynamic>? _userData;
-  bool _loading = true;
+  final ApiService _apiService = ApiService();
+  Map<String, dynamic>? analyticsData;
 
   @override
   void initState() {
     super.initState();
-    _fetchTwitchData();
+    fetchAnalytics();
   }
 
-  Future<void> _fetchTwitchData() async {
-    try {
-      var userData = await _twitchService.getUserData("your_twitch_username");
-      setState(() {
-        _userData = userData;
-        _loading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _loading = false;
-      });
-      print("Error fetching Twitch data: $e");
-    }
+  Future<void> fetchAnalytics() async {
+    var data = await _apiService.fetchTwitchData("analytics");
+    setState(() {
+      analyticsData = data;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Twitch Analytics")),
-      body: _loading
+      body: analyticsData == null
           ? Center(child: CircularProgressIndicator())
-          : _userData != null
-          ? Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Username: ${_userData!["display_name"]}", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
-            Text("Followers: ${_userData!["followers"]}"),
-            Text("Total Views: ${_userData!["view_count"]}"),
-          ],
-        ),
-      )
-          : Center(child: Text("Failed to load data")),
+          : ListView(
+              children: [
+                ListTile(
+                  title: Text("Total Watch Time: ${analyticsData!["total_watch_time"]}"),
+                ),
+                ListTile(
+                  title: Text("Total Followers: ${analyticsData!["total_followers"]}"),
+                ),
+                ListTile(
+                  title: Text("Average Viewers: ${analyticsData!["average_viewers"]}"),
+                ),
+              ],
+            ),
     );
   }
 }
